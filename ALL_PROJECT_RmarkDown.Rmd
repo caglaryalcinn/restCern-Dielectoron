@@ -1,0 +1,362 @@
+---
+title: "CERN_DİELECTRON"
+author: "Çağlar Yalçın"
+date: '2023-01-18'
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+First of all, because of our data is too big (which includes 100000 rows), we take a sample with size 1000;
+```{r}
+setwd("C:/Users/MelisaÜnyılmaz/Desktop")
+data3 <- read.csv2("dielectron3.csv",stringsAsFactors=FALSE)
+data3$Run <- as.numeric(data3$Run)
+data3$Event <- as.factor(data3$Event)
+
+data3$E1 <- as.numeric(data3$E1)
+data3$px1 <- as.numeric(data3$px1)
+data3$py1 <- as.numeric(data3$py1)
+data3$pz1 <- as.numeric(data3$pz1)
+data3$pt1 <- as.numeric(data3$pt1)
+data3$eta1 <- as.numeric(data3$eta1)
+data3$phi1 <- as.numeric(data3$phi1)
+
+data3$Q1 <- as.factor(data3$Q1)
+
+data3$E2 <- as.numeric(data3$E2)
+data3$px2 <- as.numeric(data3$px2)
+data3$py2 <- as.numeric(data3$py2)
+data3$pz2 <- as.numeric(data3$pz2)
+data3$pt2 <- as.numeric(data3$pt2)
+data3$eta2 <- as.numeric(data3$eta2)
+data3$phi2 <- as.numeric(data3$phi2)
+
+data3$Q2 <- as.factor(data3$Q2)
+
+data3$M <- as.numeric(data3$M)
+data4 <- data3[sample(1:nrow(data3),1000),]
+str(data4)
+```
+
+Then we look summary of the data, and look  some graphs; 
+
+```{r}
+summary(data4)
+library(car)
+scatterplot(E1 ~ pt1, data = data4,main="Scatter Plot of E1 and pt1")
+
+scatterplot(phi1 ~ py1, data = data4,col= "orange",main="Scatter Plot of phi1 and py1")
+
+scatterplot(eta1 ~ pz1, data = data4, col="purple",main="Scatter Plot of eta1 and pz1")
+
+scatterplot(pt2 ~ E2, data = data4, col="green",main="Scatter Plot of pt2 and E2")
+
+scatterplot(phi2 ~ py2, data = data4,col="red",main="Scatter Plot of py2 and phi2")
+```
+Normalize check;
+```{r}
+shapiro.test(data4$Run)
+shapiro.test(data4$E1)
+shapiro.test(data4$px1)
+shapiro.test(data4$py1)
+shapiro.test(data4$pz1)
+shapiro.test(data4$pt1)
+shapiro.test(data4$eta1)
+shapiro.test(data4$phi1)
+shapiro.test(data4$E2)
+shapiro.test(data4$px2)
+shapiro.test(data4$py2)
+shapiro.test(data4$pz2)
+shapiro.test(data4$pt2)
+shapiro.test(data4$eta2)
+shapiro.test(data4$phi2)
+shapiro.test(data4$M)
+```
+
+Because all of them are not normal, we need to normalize these columns. We used bestNormalize package;
+```{r}
+library("bestNormalize")
+#for E1;
+e1 <- bestNormalize(data4$E1)
+ge1 <- predict(e1)
+x_e1 <- predict(e1, newdata = ge1, inverse = TRUE)
+shapiro.test(ge1)
+
+#for px1; 
+px1_1 <- bestNormalize(data4$px1)
+gx1 <- predict(px1_1)
+x_x1 <- predict(px1_1, newdata = gx1,inverse = TRUE)
+shapiro.test(gx1)
+
+#for py1;
+py1_1 <- bestNormalize(data4$py1)
+gy1 <- predict(py1_1)
+x_y1 <- predict(py1_1, newdata = gy1,inverse = TRUE)
+shapiro.test(gy1)
+
+#for pz1;
+pz1 <- bestNormalize(data4$pz1)
+gz1 <- predict(pz1)
+x_z1 <- predict(pz1,newdata=gz1,inverse = T)
+shapiro.test(gz1)
+
+#for pt1;
+pt1 <- bestNormalize(data4$pt1)
+gt1 <- predict(pt1)
+x_t1 <- predict(pt1,newdata=gt1,inverse = T)
+shapiro.test(gt1)
+
+#for eta1;
+eta1 <- bestNormalize(data4$eta1)
+geta1 <- predict(eta1)
+x_eta1 <- predict(eta1,newdata=geta1,inverse = T)
+shapiro.test(geta1)
+
+#for phi1;
+
+phi1 <- bestNormalize(data4$phi1)
+gphi1 <- predict(phi1)
+x_phi1 <- predict(phi1,newdata=gphi1,inverse = T)
+shapiro.test(gphi1)
+
+#for E2;
+e2 <- bestNormalize(data4$E2)
+ge2 <- predict(e2)
+x_e2 <- predict(e2, newdata = ge2, inverse = TRUE)
+shapiro.test(ge2)
+
+#for px2;
+px2 <- bestNormalize(data4$px2)
+gx2 <- predict(px2)
+x_x2 <- predict(px2, newdata = gx2,inverse = TRUE)
+shapiro.test(gx2)
+
+#for py2;
+py2 <- bestNormalize(data4$py2)
+gy2 <- predict(py2)
+x_y2 <- predict(py2, newdata = gy2,inverse = TRUE)
+shapiro.test(gy2)
+
+#for pz2;
+pz2 <- bestNormalize(data4$pz2)
+gz2 <- predict(pz2)
+x_z2 <- predict(pz2,newdata=gz2,inverse = T)
+shapiro.test(gz2)
+
+#for pt2;
+pt2 <- bestNormalize(data4$pt2)
+gt2 <- predict(pt2)
+x_t2 <- predict(pt2,newdata=gt2,inverse = T)
+shapiro.test(gt2)
+
+#for eta2;
+
+eta2 <- bestNormalize(data4$eta2)
+geta2 <- predict(eta2)
+x_eta2 <- predict(eta2,newdata=geta2,inverse = T)
+shapiro.test(geta2)
+
+#for phi2;
+
+phi2 <- bestNormalize(data4$phi2)
+gphi2 <- predict(phi2)
+x_phi2 <- predict(phi2,newdata=gphi2,inverse = T)
+shapiro.test(gphi2)
+
+
+#for M;
+
+m <- bestNormalize(data4$M)
+gm <- predict(m)
+xm <- predict(m,newdata=gm,inverse = T)
+shapiro.test(gm)
+```
+
+
+
+```{r}
+data4$E1 <- ge1
+data4$px1 <- gx1
+data4$py1 <- gy1
+data4$pz1 <- gz1
+data4$pt1 <- gt1
+data4$eta1 <- geta1
+data4$phi1 <- gphi1
+data4$E2 <- ge2
+data4$px2 <- gx2
+data4$py2 <- gy2
+data4$pz2 <- gz2
+data4$pt2 <- gt2
+data4$eta2 <- geta2
+data4$phi2 <- gphi2
+data4$M <- gm
+```
+After normalizing, we do't need to remove outliers.
+
+## QUESTION 1 : 
+
+First of all, we can add a sign column, which includes dielectron and mass. If electron 1 and electron 2 have the same sign, it means mass, but if they have different signs they are dielectron.we examine that there is a difference between two type electrons qualities.
+
+```{r}
+library(dplyr)
+
+data5 <- data4 %>% mutate(Sign =case_when(
+  c(Q1==1 & Q2==1) ~ "mass",
+  c(Q1==-1 & Q2== -1) ~ "mass",
+  c(Q1==-1 & Q2==1)~ "dielectron",
+  c(Q1==1 & Q2==-1) ~ "dielectron"))
+```
+
+We checked before normality assumtions ,but there is a nonconstant variance problem according to the  boxM tests results .We cant apply log or square transformation because negative values we applied. We applied y^(1/3) transformations and problem solved. 
+
+```{r}
+library(heplots)
+library(ICSNP)
+
+a <- data5[c(3,4,5,6,11,12,13,14,20)]
+
+
+```
+Then conduct a hypothesis test;
+
+```{r}
+HotellingsT2(cbind(a$px1,a$py1,a$pz1,a$E1,a$px2,a$py2,a$pz2,a$E2)~a$Sign)
+```
+
+According to the result, they are not equal.
+
+
+## QUESTION 2 
+
+First of all,we are lots variable in order to explain our responde and most of them are insignificant or quite correlated each other. we remove non-numeric variables and, looked all correlations and then we took the most correlated ones and desired subsets for principal component regression,just have dielectrons;
+```{r}
+data0 <- data5 %>% subset(Sign=="dielectron")
+cor(data0[c(1,3,4,5,6,7,8,9,11,12,13,14,15,17)])
+
+data6 <- data0[,c(3,5,6,7,8,9,11,13,15,17)]
+
+res <- cor(data6, method="pearson")
+corrplot::corrplot(res, method= "color", order = "hclust")
+```
+
+And then, we scaled our data,and looked the scaled correlations again. The response variable that we choose is M (invariant mass of two electrons), and we dont add the pca analysis.After finding pca values, we found the eigenvalues and eigenvectors. Accorrding to the scree plot, first 5 components explain the almost 84% of the variability. And then, we checked independency. Because all of them independent, we can continue the analysis.
+
+```{r}
+data7<-scale(data6)
+cor(data7)
+
+pca1 <- prcomp(data7)
+summary(pca1)
+library(dplyr)
+pca1$x %>% head(6)
+as.matrix(data7)%*%as.matrix(pca1$rotation) %>% head(6) 
+pca1$rotation
+pca1$sdev
+
+library(factoextra) 
+fviz_eig(pca1,addlabels=TRUE) 
+pca<-pca1$x[,1:5]
+
+head(pca)
+res1 <- cor(pca, method="pearson")
+corrplot::corrplot(res1, method= "color")
+
+cor(data7,pca)
+
+```
+tThe first 5 variables having the with high contribution;
+
+```{r}
+fviz_pca_var(pca1,axes = c(1, 2))
+fviz_pca_var(pca1,axes = c(2, 3))
+
+fviz_pca_var(pca1, col.var = "contrib")+ scale_color_gradient2( low="red", mid="green",
+                                                                high="blue", midpoint=96, space = "Lab")
+
+
+ols.data <- data.frame(a=data0[,19],pca)
+lmodel <- lm(a ~ ., data = ols.data)
+summary(lmodel)
+```
+According to the summary, pca's are significant.
+
+## QUESTION 3
+we desire to discrimant analys on electrons sign stitation(dielectron or mass).we checked fisher discrimination analysis assumtion before.so we can continue,Firstly we subset desire numeriv variables and we separate to data as tran an test.
+```{r}
+data8 <- data5[,c(3,5,6,7,8,9,11,13,15,17,20)]
+sample <- sample(c(TRUE, FALSE), nrow(data8), replace=TRUE, prob=c(0.7,0.3))
+train <- data8[sample, ]
+test <- data8[!sample, ] 
+```
+after seperation we conduct the model.plot of model shows the linear discriminants obtained from the equation .And we conduct the predict model values."predict(Model)" return 3 variable and one of them "x" that we intrest in.
+
+```{r}
+library(MASS)
+model <- lda(Sign~.,data = train)
+plot(model)
+model.values <- predict(model)
+```
+
+and we obtain test prediction and train prediction values and we obtain their table .Finally we conduct to accuraccy of discrimination on train and test subsets that is 0.605 and 0.546 respectively.
+
+
+```{r}
+ 
+train_predict<- predict(model,train)$class
+test.predict <- predict(model,test)$class
+table_train <- table(Predicted =train_predict, Actual = train$Sign)
+table_train
+table_test <- table(Predicted =test.predict, Actual = test$Sign)
+table_test
+sum(diag(table_train))/sum(table_train)
+sum(diag(table_test))/sum(table_test)
+
+```
+
+
+```{r}
+########### construct random forrest model,there is no assumtion normality in RF so we use orjinal data.
+data9 <- data5orj[,c(3,5,6,7,8,9,11,13,15,17,20)]
+sample2 <- sample(c(TRUE, FALSE), nrow(data9), replace=TRUE, prob=c(0.7,0.3))
+train2 <- data9[sample, ]
+train
+test2 <- data9[!sample, ] 
+data5orj$Sign<-as.factor(data5orj$Sign)
+set.seed(120)  # Setting seed
+classifier_RF = randomForest(x = train2[-5],
+                             y = train2$Sign,
+                             ntree = 1)
+train2$Sign <- as.factor(train2$Sign)
+test2$Sign <- as.factor(test2$Sign)
+y_pred = predict(classifier_RF, newdata = test2[-5])
+y_pred.train = predict(classifier_RF, newdata = train2[-5])
+table_test2 <- table(Predicted =y_pred, Actual = test2$Sign)
+table_train2 <- table(Predicted =y_pred.train, Actual = train2$Sign)
+table_train2
+table_test2
+sum(diag(table_train2))/sum(table_train2)
+sum(diag(table_test2))/sum(table_test2)
+plot(classifier_RF)
+importance(classifier_RF)
+var<-varImpPlot(classifier_RF)
+var
+```
+
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
